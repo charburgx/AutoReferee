@@ -31,9 +31,6 @@ import org.bukkit.scoreboard.Scoreboard;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
-import org.mcstats.Metrics;
-import org.mcstats.Metrics.Graph;
-
 import org.mctourney.autoreferee.commands.AdminCommands;
 import org.mctourney.autoreferee.commands.ConfigurationCommands;
 import org.mctourney.autoreferee.commands.PlayerCommands;
@@ -53,7 +50,6 @@ import org.mctourney.autoreferee.listeners.lobby.LobbyListener.LobbyMode;
 import org.mctourney.autoreferee.util.NullChunkGenerator;
 import org.mctourney.autoreferee.util.SportBukkitUtil;
 import org.mctourney.autoreferee.util.commands.CommandManager;
-import org.mctourney.autoreferee.util.metrics.PieChartGraph;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -338,10 +334,6 @@ public class AutoReferee extends JavaPlugin
 		// attempt to setup the plugin channels
 		setupPluginChannels();
 
-		// fire up the plugin metrics
-		try { setupPluginMetrics(); }
-		catch (IOException e) { getLogger().severe("Plugin Metrics not enabled."); }
-
 		// wrap up, debug to follow this message
 		getLogger().info(this.getName() + " (" + Bukkit.getName() + ") loaded successfully" +
 			(SportBukkitUtil.hasSportBukkitApi() ? " with SportBukkit API" : "") + ".");
@@ -390,23 +382,6 @@ public class AutoReferee extends JavaPlugin
 		// setup referee plugin channels
 		m.registerOutgoingPluginChannel(this, REFEREE_PLUGIN_CHANNEL);
 		m.registerIncomingPluginChannel(this, REFEREE_PLUGIN_CHANNEL, refChannelListener);
-	}
-
-	protected PieChartGraph playedMapsTracker = null;
-
-	private void setupPluginMetrics()
-		throws IOException
-	{
-		Metrics metrics = new Metrics(this);
-
-		Set<String> mapNames = Sets.newHashSet();
-		for (AutoRefMap map : AutoRefMap.getRemoteMaps())
-			mapNames.add(map.getName());
-
-		Graph gMaps = metrics.createGraph("Most Popular Maps");
-		playedMapsTracker = new PieChartGraph(gMaps, mapNames);
-
-		metrics.start();
 	}
 
 	public static WorldEditPlugin getWorldEdit()
